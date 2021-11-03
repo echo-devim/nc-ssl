@@ -13,6 +13,8 @@ which speaks SSL/TLS to the server.
     $    -v: verify hosts's certificate
     $    -2: use SSL version 2
     $    -3: use SSL version 3
+    $    -c: use the specified certificate
+    $    -k: use the specified private key
 
 # Example #
 
