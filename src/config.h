@@ -6,6 +6,8 @@ struct config {
     int verify_cert;
     int use_sslv2;
     int use_sslv3;
+    const char *certfile;
+    const char *keyfile;
 };
 
 extern struct config config;

@@ -91,7 +91,7 @@ int tcp_connect(const char *host, const char *service)
         goto label;                             \
     } while (0)
 
-void ssl_connect(SSL **ssl, SSL_CTX **ctx, int sock, const char *host)
+void ssl_connect(SSL **ssl, SSL_CTX **ctx, int sock, const char *host, const char *certfile, const char *keyfile)
 {
     if (!ssl || !ctx || sock < 0)
         err("Invalid arguments passed to %s", __func__);
@@ -103,6 +103,28 @@ void ssl_connect(SSL **ssl, SSL_CTX **ctx, int sock, const char *host)
     if (*ctx == NULL) {
         ERR_print_errors_fp(stderr);
         err("SSL_CTX_new() failed");
+    }
+
+    if (certfile != NULL) {
+        /* Load the client certificate into the SSL_CTX structure */
+        if (SSL_CTX_use_certificate_file(*ctx, certfile, SSL_FILETYPE_PEM) <= 0) {
+            log_err("Cannot use Certificate File\n");
+            goto clean0;
+        }
+    }
+
+    if (keyfile != NULL) { 
+        /* Load the private-key corresponding to the client certificate */
+        if (SSL_CTX_use_PrivateKey_file(*ctx, keyfile, SSL_FILETYPE_PEM) <= 0) {
+            log_err("Cannot use Private Key\n");
+            goto clean0;
+        } else {
+            /* Check if the client certificate and private-key matches */
+            if (!SSL_CTX_check_private_key(*ctx)) {
+                log_err("Private key does not match the certificate public key\n");
+                goto clean0;
+            }
+        }
     }
 
     /* set method: default: TLS */

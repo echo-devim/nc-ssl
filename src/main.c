@@ -23,6 +23,8 @@ __attribute__((noreturn)) static void print_usage_and_exit(void)
     fprintf(stderr, "    -v: verify hosts's certificate\n");
     fprintf(stderr, "    -2: use SSL version 2\n");
     fprintf(stderr, "    -3: use SSL version 3\n");
+    fprintf(stderr, "    -c: use the specified certificate\n");
+    fprintf(stderr, "    -k: use the specified private key\n");
     fprintf(stderr, "nc-ssl Version 1.3 (C) Kurt Kanzenbach 2015 <kurt@kmk-computers.de>\n");
     exit(EXIT_FAILURE);
 }
@@ -78,9 +80,11 @@ int main(int argc, char *argv[])
     SSL_CTX *ctx;
     int socket , ret = EXIT_FAILURE, c;
     char *host, *service;
+    config.certfile = NULL;
+    config.keyfile = NULL;
 
     /* parse args */
-    while ((c = getopt(argc, argv, "vd23")) != -1) {
+    while ((c = getopt(argc, argv, "vd23c:k:")) != -1) {
         switch (c) {
         case 'd':
             config.debug = 1;
@@ -93,6 +97,14 @@ int main(int argc, char *argv[])
             break;
         case '3':
             config.use_sslv3 = 1;
+            break;
+        case 'c':
+            config.certfile = (const char*)optarg;
+            printf("Using certificate: %s\n",config.certfile);
+            break;
+        case 'k':
+            config.keyfile = (const char*)optarg;
+            printf("Using private key: %s\n",config.keyfile);
             break;
         case '?':
         default:
@@ -110,7 +122,7 @@ int main(int argc, char *argv[])
     dbg("Connected to host %s on service %s", host, service);
 
     /* ssl connect */
-    ssl_connect(&ssl, &ctx, socket, host);
+    ssl_connect(&ssl, &ctx, socket, host, config.certfile, config.keyfile);
     dbg("SSL connection to host %s established", host);
 
     /* setup signals */
