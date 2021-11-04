@@ -100,11 +100,11 @@ int main(int argc, char *argv[])
             break;
         case 'c':
             config.certfile = (const char*)optarg;
-            printf("Using certificate: %s\n",config.certfile);
+            dbg("Using certificate: %s\n",config.certfile);
             break;
         case 'k':
             config.keyfile = (const char*)optarg;
-            printf("Using private key: %s\n",config.keyfile);
+            dbg("Using private key: %s\n",config.keyfile);
             break;
         case '?':
         default:
